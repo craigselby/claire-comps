@@ -1,0 +1,71 @@
+[
+  {
+    "id": "radio",
+    "icon": "📻",
+    "title": "Radio Phone-ins",
+    "keywords": [
+      "radio competition",
+      "phone in to win",
+      "text to win",
+      "call to win",
+      "radio prize"
+    ]
+  },
+  {
+    "id": "social",
+    "icon": "📱",
+    "title": "Social Media Giveaways",
+    "keywords": [
+      "win",
+      "giveaway",
+      "competition",
+      "prize draw",
+      "retweet to win",
+      "follow to win",
+      "like share tag"
+    ]
+  },
+  {
+    "id": "online",
+    "icon": "💻",
+    "title": "Online Competitions",
+    "keywords": [
+      "enter to win",
+      "free prize draw",
+      "closing date",
+      "no purchase necessary",
+      "enter now"
+    ]
+  },
+  {
+    "id": "supermarket",
+    "icon": "🛒",
+    "title": "Retailer / Brand Promos",
+    "keywords": [
+      "promotional competition",
+      "on pack competition",
+      "promotional prize draw",
+      "loyalty prize"
+    ]
+  },
+  {
+    "id": "survey",
+    "icon": "📝",
+    "title": "Survey & Quiz Comps",
+    "keywords": [
+      "answer to win",
+      "quiz competition",
+      "survey prize",
+      "complete to win"
+    ]
+  },
+  {
+    "id": "custom",
+    "icon": "⭐",
+    "title": "My Custom Keywords",
+    "keywords": [
+      "like, share, tag",
+      "test-word"
+    ]
+  }
+]
