@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claire's Competition Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0c1a;
+    --surface: #181426;
+    --card: #201c30;
+    --border: #2e2845;
+    --accent: #c084fc;
+    --accent2: #f0abfc;
+    --gold: #fbbf24;
+    --text: #f3f0ff;
+    --muted: #9490a8;
+    --danger: #f87171;
+    --success: #86efac;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(192, 132, 252, 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 90% 80%, rgba(240, 171, 252, 0.08) 0%, transparent 50%);
+  }
+
+  header {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 1.5rem auto 0;
+  }
+
+  .subtitle-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(192, 132, 252, 0.12);
+    border: 1px solid rgba(192, 132, 252, 0.25);
+    border-radius: 20px;
+    padding: 0.3rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent2) 60%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 300;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  /* ── Controls bar ── */
+  .controls-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 500px) {
+    .controls-bar { grid-template-columns: 1fr; }
+  }
+
+  .control-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  select {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.65rem 0.9rem;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239490a8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    transition: border-color 0.2s;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  /* ── Keyword sections ── */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .section:focus-within { border-color: rgba(192, 132, 252, 0.4); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.1rem;
+    cursor: pointer;
+    user-select: none;
+    gap: 0.8rem;
+  }
+
+  .section-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex: 1;
+  }
+
+  .section-icon {
+    font-size: 1.1rem;
+    width: 2rem;
+    text-align: center;
+  }
+
+  .section-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .section-count {
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 0.15rem 0.6rem;
+  }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+  }
+
+  .section.open .chevron { transform: rotate(180deg); }
+
+  .section-body {
+    display: none;
+    padding: 0 1.1rem 1.1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .section.open .section-body { display: block; }
+
+  .keyword-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+    min-height: 1.5rem;
+  }
+
+  .keyword-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(192, 132, 252, 0.12);
+    border: 1px solid rgba(192, 132, 252, 0.25);
+    border-radius: 20px;
+    padding: 0.3rem 0.7rem 0.3rem 0.9rem;
+    font-size: 0.82rem;
+    color: var(--accent2);
+    animation: tagIn 0.15s ease;
+  }
+
+  @keyframes tagIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .keyword-tag button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+
+  .keyword-tag button:hover { color: var(--danger); }
+
+  .add-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+  }
+
+  .add-row input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    padding: 0.55rem 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .add-row input::placeholder { color: var(--muted); }
+  .add-row input:focus { border-color: var(--accent); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-sm {
+    font-size: 0.82rem;
+    padding: 0.55rem 0.9rem;
+  }
+
+  .btn-add {
+    background: rgba(192, 132, 252, 0.15);
+    color: var(--accent);
+    border: 1px solid rgba(192, 132, 252, 0.3);
+  }
+
+  .btn-add:hover {
+    background: rgba(192, 132, 252, 0.25);
+    border-color: var(--accent);
+  }
+
+  /* ── Search buttons ── */
+  .search-section {
+    margin-top: 2rem;
+  }
+
+  .search-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  .search-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: border-color 0.2s, transform 0.15s;
+    animation: cardIn 0.2s ease;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .search-card:hover {
+    border-color: rgba(192, 132, 252, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .search-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .search-card-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .search-card-icon { font-size: 1rem; }
+
+  .search-card-query {
+    font-size: 0.83rem;
+    color: var(--accent2);
+    font-style: italic;
+    line-height: 1.4;
+    word-break: break-all;
+  }
+
+  .btn-open {
+    background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(240, 171, 252, 0.1));
+    color: var(--text);
+    border: 1px solid rgba(192, 132, 252, 0.35);
+    font-size: 0.8rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 7px;
+    align-self: flex-start;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.15s;
+  }
+
+  .btn-open:hover {
+    background: linear-gradient(135deg, rgba(192, 132, 252, 0.35), rgba(240, 171, 252, 0.2));
+    border-color: var(--accent);
+  }
+
+  .btn-open-all {
+    width: 100%;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #0e0c1a;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    padding: 0.85rem 1.5rem;
+    margin-bottom: 0.5rem;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .btn-open-all:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .open-all-note {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  /* ── Tip box ── */
+  .tip {
+    background: rgba(251, 191, 36, 0.07);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    font-size: 0.82rem;
+    color: #fcd34d;
+    margin-top: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .tip strong { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="subtitle-tag">🏆 Competition Hunter</div>
+  <h1>Claire's Search Tool</h1>
+  <p>Generate targeted Google UK competition searches in one click</p>
+</header>
+
+<div class="container">
+
+  <!-- Time & Type controls -->
+  <div class="controls-bar">
+    <div class="control-group">
+      <label>Time Frame</label>
+      <select id="timeframe">
+        <option value="d">Last 24 hours</option>
+        <option value="w" selected>Last week</option>
+        <option value="m">Last month</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Search Type</label>
+      <select id="searchtype">
+        <option value="web" selected>Web (everything)</option>
+        <option value="nws">News only</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Keyword sections -->
+  <div id="sections"></div>
+
+  <!-- Search links -->
+  <div class="search-section">
+    <h2>Your Searches</h2>
+    <div id="search-grid" class="search-grid"></div>
+    <button class="btn btn-open-all" onclick="openAll()">🚀 Open All Searches</button>
+    <p class="open-all-note">Note: your browser may block pop-ups — allow them for this page</p>
+  </div>
+
+  <div class="tip">
+    <strong>💡 How to use:</strong> Each keyword category below generates its own Google UK search, filtered to UK results and your chosen time frame. Add your own keywords to any category, or remove ones you don't need. The searches use <code>site:.co.uk OR "UK"</code> to bias results toward British competitions.
+  </div>
+
+</div>
+
+<script>
+// ── Default keyword categories ──
+const defaultSections = [
+  {
+    id: 'radio',
+    icon: '📻',
+    title: 'Radio Phone-ins',
+    keywords: ['radio competition', 'phone in to win', 'text to win', 'call to win', 'radio prize'],
+  },
+  {
+    id: 'social',
+    icon: '📱',
+    title: 'Social Media Giveaways',
+    keywords: ['win', 'giveaway', 'competition', 'prize draw', 'retweet to win', 'follow to win'],
+  },
+  {
+    id: 'online',
+    icon: '💻',
+    title: 'Online Competitions',
+    keywords: ['enter to win', 'free prize draw', 'closing date', 'no purchase necessary', 'enter now'],
+  },
+  {
+    id: 'supermarket',
+    icon: '🛒',
+    title: 'Retailer / Brand Promos',
+    keywords: ['promotional competition', 'on pack competition', 'promotional prize draw', 'loyalty prize'],
+  },
+  {
+    id: 'survey',
+    icon: '📝',
+    title: 'Survey & Quiz Comps',
+    keywords: ['answer to win', 'quiz competition', 'survey prize', 'complete to win'],
+  },
+  {
+    id: 'custom',
+    icon: '⭐',
+    title: 'My Custom Keywords',
+    keywords: [],
+  },
+];
+
+// ── State ──
+let sections = JSON.parse(localStorage.getItem('comp_sections') || 'null') || defaultSections;
+
+function save() {
+  localStorage.setItem('comp_sections', JSON.stringify(sections));
+}
+
+// ── Build URL ──
+function buildUrl(keywords) {
+  const tf = document.getElementById('timeframe').value;
+  const st = document.getElementById('searchtype').value;
+  const query = keywords.join(' OR ');
+  const fullQuery = `(${query}) (site:.co.uk OR "UK")`;
+  const encoded = encodeURIComponent(fullQuery);
+  const tbs = `qdr:${tf}`;
+  let url = `https://www.google.co.uk/search?q=${encoded}&tbs=${tbs}&gl=uk&hl=en`;
+  if (st === 'nws') url += '&tbm=nws';
+  return url;
+}
+
+// ── Render sections ──
+function renderSections() {
+  const container = document.getElementById('sections');
+  container.innerHTML = '';
+
+  sections.forEach((sec, si) => {
+    const div = document.createElement('div');
+    div.className = 'section' + (si === 0 ? ' open' : '');
+    div.innerHTML = `
+      <div class="section-header" onclick="toggleSection(${si})">
+        <div class="section-header-left">
+          <span class="section-icon">${sec.icon}</span>
+          <span class="section-title">${sec.title}</span>
+          <span class="section-count">${sec.keywords.length} keyword${sec.keywords.length !== 1 ? 's' : ''}</span>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="keyword-list" id="tags-${si}">
+          ${sec.keywords.map((kw, ki) => `
+            <span class="keyword-tag">
+              ${kw}
+              <button onclick="removeKeyword(${si}, ${ki})" title="Remove">✕</button>
+            </span>
+          `).join('')}
+          ${sec.keywords.length === 0 ? '<span style="color:var(--muted);font-size:0.82rem;font-style:italic;">No keywords yet — add one below</span>' : ''}
+        </div>
+        <div class="add-row">
+          <input type="text" id="input-${si}" placeholder="Add keyword…" onkeydown="if(event.key==='Enter')addKeyword(${si})">
+          <button class="btn btn-sm btn-add" onclick="addKeyword(${si})">+ Add</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  renderSearchGrid();
+}
+
+function toggleSection(si) {
+  const els = document.querySelectorAll('.section');
+  els[si].classList.toggle('open');
+}
+
+function addKeyword(si) {
+  const input = document.getElementById(`input-${si}`);
+  const val = input.value.trim();
+  if (!val) return;
+  sections[si].keywords.push(val);
+  input.value = '';
+  save();
+  renderSections();
+  // Re-open the section
+  const els = document.querySelectorAll('.section');
+  els[si].classList.add('open');
+  document.getElementById(`input-${si}`).focus();
+}
+
+function removeKeyword(si, ki) {
+  sections[si].keywords.splice(ki, 1);
+  save();
+  renderSections();
+  const els = document.querySelectorAll('.section');
+  els[si].classList.add('open');
+}
+
+// ── Render search cards ──
+function renderSearchGrid() {
+  const grid = document.getElementById('search-grid');
+  grid.innerHTML = '';
+
+  const activeSections = sections.filter(s => s.keywords.length > 0);
+
+  if (activeSections.length === 0) {
+    grid.innerHTML = '<div class="empty-state">Add keywords to a category above to generate search links.</div>';
+    return;
+  }
+
+  activeSections.forEach(sec => {
+    const url = buildUrl(sec.keywords);
+    const preview = sec.keywords.slice(0, 3).join(' OR ') + (sec.keywords.length > 3 ? '…' : '');
+    const card = document.createElement('div');
+    card.className = 'search-card';
+    card.innerHTML = `
+      <div class="search-card-header">
+        <span class="search-card-label">${sec.title}</span>
+        <span class="search-card-icon">${sec.icon}</span>
+      </div>
+      <div class="search-card-query">${preview}</div>
+      <a href="${url}" target="_blank" class="btn-open">Open Search ↗</a>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function openAll() {
+  const activeSections = sections.filter(s => s.keywords.length > 0);
+  if (activeSections.length === 0) return;
+  activeSections.forEach(sec => {
+    window.open(buildUrl(sec.keywords), '_blank');
+  });
+}
+
+// Re-render search grid on control change
+document.getElementById('timeframe').addEventListener('change', renderSearchGrid);
+document.getElementById('searchtype').addEventListener('change', renderSearchGrid);
+
+// ── Init ──
+renderSections();
+</script>
+</body>
+</html>
